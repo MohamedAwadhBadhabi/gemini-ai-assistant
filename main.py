@@ -3,7 +3,7 @@ import os
 
 from dotenv import load_dotenv
 from google import genai
-from google.genai import errors
+from google.genai import errors, types
 
 from gemini_client import generate_response
 
@@ -25,7 +25,14 @@ if not api_key:
 # 2. Initialize Gemini Client
 # =====================================
 
-client = genai.Client(api_key=api_key)
+client = genai.Client(
+    api_key=api_key,
+    http_options=types.HttpOptions(
+        retry_options=types.HttpRetryOptions(
+            attempts=1
+        )
+    )
+)
 
 model = "gemini-3.5-flash-lite"
 
@@ -55,12 +62,6 @@ try:
 
     print("\n--- Gemini Response ---")
     print(response_text)
-
-
-except RuntimeError as error:
-
-    print("\nRequest Failed:")
-    print(error)
 
 
 except errors.APIError as error:
